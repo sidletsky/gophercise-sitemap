@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -21,8 +22,8 @@ func NewClient(httpClient *http.Client, baseUrl string) (client Client) {
 	return client
 }
 
-// Get makes an http Get request
-func (client *Client) Get(url string) (*http.Response, error) {
+// GetPage makes an http GetPage request
+func (client *Client) GetPage(url string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -33,5 +34,11 @@ func (client *Client) Get(url string) (*http.Response, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	return response, nil
+	defer response.Body.Close()
+	htmlPage, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return htmlPage, nil
 }
