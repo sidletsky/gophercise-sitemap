@@ -2,11 +2,12 @@ package gophercise_sitemap
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"github.com/pkg/errors"
+	"strings"
+
 	gophercise_link "github.com/sidletsky/gophercise-link"
 	"github.com/sidletsky/gophercise-sitemap/internal"
-	"strings"
 )
 
 func Parse(baseUrl string) (*Node, error) {
