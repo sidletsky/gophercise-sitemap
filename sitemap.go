@@ -8,9 +8,12 @@ import (
 )
 
 func Parse(baseUrl string) (*Node, error) {
-	client := internal.NewClient(nil, baseUrl)
+	client, err := internal.NewClient(nil, baseUrl)
+	if err != nil {
+		return nil, err
+	}
 	sitemap := Node{url: baseUrl}
-	err := buildSitemap(&client, sitemap.url, &sitemap)
+	err = buildSitemap(client, sitemap.url, &sitemap)
 	if err != nil {
 		panic(err)
 		return nil, err

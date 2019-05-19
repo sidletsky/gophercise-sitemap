@@ -2,27 +2,39 @@ package internal
 
 import (
 	"bytes"
+	"errors"
+	link "github.com/sidletsky/gophercise-link"
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	link "github.com/sidletsky/gophercise-link"
+	"os/exec"
+	"strings"
 )
 
 type Client struct {
-	BaseUrl    string
 	HttpClient *http.Client
 }
 
 // New returns a Client that that wraps operations.
-func NewClient(httpClient *http.Client, baseUrl string) (client Client) {
+func NewClient(httpClient *http.Client, baseUrl string) (*Client, error) {
+	var client Client
 	if httpClient == nil {
 		client.HttpClient = http.DefaultClient
 	} else {
 		client.HttpClient = httpClient
 	}
-	client.BaseUrl = baseUrl
-	return client
+	if !ping(baseUrl) {
+		return nil, errors.New("destination host unreachable")
+	}
+	return &client, nil
+}
+
+func ping(url string) bool {
+	out, _ := exec.Command("ping", url, "-c 5", "-i 3", "-w 10").Output()
+	if strings.Contains(string(out), "Destination Host Unreachable") {
+		return false
+	}
+	return true
 }
 
 // GetPage makes an http GetPage request
