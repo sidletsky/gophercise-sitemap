@@ -1,43 +1,50 @@
-package gophercise_sitemap
+package sitemap
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
 	"strings"
 
-	gophercise_link "github.com/sidletsky/gophercise-link"
-	"github.com/sidletsky/gophercise-sitemap/internal"
+	"github.com/sidletsky/sitemap/internal"
 )
 
 func Parse(baseUrl string) (*Node, error) {
 	client := internal.NewClient(nil, baseUrl)
-	page, err := client.GetPage(baseUrl)
-	if err != nil {
-		return nil, err
-	}
-	reader := bytes.NewReader(page)
-	links, err := gophercise_link.Parse(reader)
-	if err != nil {
-		return nil, err
-	}
 	sitemap := Node{url: baseUrl}
-	for _, link := range links {
-		cleanLink, err := clearUrl(link.Href, baseUrl)
-		if err == nil {
-			sitemap.addChild(cleanLink)
-		}
+	err := buildSitemap(&client, sitemap.url, &sitemap)
+	if err != nil {
+		panic(err)
+		return nil, err
 	}
-	for _, child := range sitemap.children {
-		fmt.Println(child.url)
-	}
+	sitemap.Print("")
 	return nil, nil
 }
 
-func clearUrl(url, baseUrl string) (string, error) {
+func buildSitemap(client *internal.Client, baseUrl string, node *Node) error {
+	links, err := client.GetPageLinks(node.url)
+	if err != nil {
+		return err
+	}
+	for _, link := range links {
+		cleanLink, err := cleanUrl(link.Href, baseUrl)
+		if err == nil {
+			node.addChild(cleanLink)
+		}
+	}
+	for _, child := range node.children {
+		if !child.root().contains(child.url) {
+			err := buildSitemap(client, baseUrl, child)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func cleanUrl(url, baseUrl string) (string, error) {
 	// not in our website
 	if !strings.HasPrefix(url, baseUrl) {
-		return "", errors.New("Not in targeted domain")
+		return "", errors.New("not in targeted domain")
 	}
 	ret := url
 	// relative link (e.g. /content)

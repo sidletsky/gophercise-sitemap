@@ -1,7 +1,7 @@
 package main
 
-import gophercise_sitemap "github.com/sidletsky/gophercise-sitemap"
+import sitemap "github.com/sidletsky/sitemap"
 
 func main() {
-	_, _ = gophercise_sitemap.Parse("https://www.calhoun.io/")
+	_, _ = sitemap.Parse("https://www.calhoun.io/")
 }

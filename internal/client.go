@@ -1,9 +1,13 @@
 package internal
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	link "github.com/sidletsky/gophercise-link"
 )
 
 type Client struct {
@@ -41,4 +45,18 @@ func (client *Client) GetPage(url string) ([]byte, error) {
 		return nil, err
 	}
 	return htmlPage, nil
+}
+
+func (client *Client) GetPageLinks(url string) ([]link.Link, error) {
+	fmt.Println(url)
+	page, err := client.GetPage(url)
+	if err != nil {
+		return nil, err
+	}
+	reader := bytes.NewReader(page)
+	links, err := link.Parse(reader)
+	if err != nil {
+		return nil, err
+	}
+	return links, nil
 }
