@@ -31,11 +31,9 @@ func buildSitemap(client *internal.Client, baseUrl string, node *Node) error {
 		}
 	}
 	for _, child := range node.children {
-		if !child.root().contains(child.url) {
-			err := buildSitemap(client, baseUrl, child)
-			if err != nil {
-				return err
-			}
+		err := buildSitemap(client, baseUrl, child)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
