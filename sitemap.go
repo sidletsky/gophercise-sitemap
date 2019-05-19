@@ -41,18 +41,23 @@ func buildSitemap(client *internal.Client, baseUrl string, node *Node) error {
 	return nil
 }
 
-func cleanUrl(url, baseUrl string) (string, error) {
+func cleanUrl(url, domain string) (string, error) {
+	// relative link (e.g. /content)
+	if url == "/" {
+		return domain, nil
+	}
+	if strings.HasSuffix(domain, "/") {
+		domain = domain[:len(domain)-1]
+	}
+	if strings.HasPrefix(url, "/") {
+		url = domain + url
+	}
+	if strings.HasSuffix(url, "/") {
+		url = url[:len(url)-1]
+	}
 	// not in our website
-	if !strings.HasPrefix(url, baseUrl) {
+	if !strings.HasPrefix(url, domain) {
 		return "", errors.New("not in targeted domain")
 	}
-	ret := url
-	// relative link (e.g. /content)
-	if strings.HasPrefix(ret, "/") {
-		ret = baseUrl + ret
-	}
-	if strings.HasSuffix(ret, "/") {
-		ret = ret[:len(ret)-1]
-	}
-	return ret, nil
+	return url, nil
 }
