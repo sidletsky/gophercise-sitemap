@@ -2,6 +2,7 @@ package sitemap
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/sidletsky/sitemap/internal"
@@ -19,6 +20,11 @@ func Parse(baseUrl string) (*Node, error) {
 		return nil, err
 	}
 	sitemap.Print("")
+	fmt.Println("printing")
+	fmt.Println(sitemap.flat())
+	for _, v := range sitemap.flat() {
+		fmt.Println(v.url)
+	}
 	return nil, nil
 }
 

@@ -1,6 +1,8 @@
 package sitemap
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Node struct {
 	url      string
@@ -43,4 +45,13 @@ func (node *Node) Print(separator string) {
 	for _, child := range node.children {
 		child.Print(separator + " ")
 	}
+}
+
+func (node Node) flat() []Node {
+	var nodes []Node
+	nodes = append(nodes, node)
+	for _, child := range node.children {
+		nodes = append(nodes, child.flat()...)
+	}
+	return nodes
 }
