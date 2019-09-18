@@ -3,12 +3,13 @@ package internal
 import (
 	"bytes"
 	"errors"
-	link "github.com/sidletsky/gophercise-link"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os/exec"
 	"strings"
+
+	link "github.com/sidletsky/gophercise-link"
 )
 
 type Client struct {
@@ -31,10 +32,7 @@ func NewClient(httpClient *http.Client, baseUrl string) (*Client, error) {
 
 func ping(url string) bool {
 	out, _ := exec.Command("ping", url, "-c 5", "-i 3", "-w 10").Output()
-	if strings.Contains(string(out), "Destination Host Unreachable") {
-		return false
-	}
-	return true
+	return !strings.Contains(string(out), "Destination Host Unreachable")
 }
 
 // GetPage makes an http GetPage request
