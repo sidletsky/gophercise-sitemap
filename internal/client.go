@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -16,7 +15,7 @@ type Client struct {
 	HttpClient *http.Client
 }
 
-// New returns a Client that that wraps operations.
+// NewClient returns a Client that that wraps operations.
 func NewClient(httpClient *http.Client, baseUrl string) (*Client, error) {
 	var client Client
 	if httpClient == nil {
@@ -35,29 +34,8 @@ func ping(url string) bool {
 	return !strings.Contains(string(out), "Destination Host Unreachable")
 }
 
-// GetPage makes an http GetPage request
-func (client *Client) GetPage(url string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	response, err := client.HttpClient.Do(req)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	defer response.Body.Close()
-	htmlPage, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	return htmlPage, nil
-}
-
 func (client *Client) GetPageLinks(url string) ([]link.Link, error) {
-	page, err := client.GetPage(url)
+	page, err := client.getPage(url)
 	if err != nil {
 		return nil, err
 	}
@@ -67,4 +45,22 @@ func (client *Client) GetPageLinks(url string) ([]link.Link, error) {
 		return nil, err
 	}
 	return links, nil
+}
+
+// getPage makes an http get request
+func (client *Client) getPage(url string) ([]byte, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	response, err := client.HttpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	htmlPage, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	return htmlPage, nil
 }

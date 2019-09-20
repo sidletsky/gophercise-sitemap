@@ -1,7 +1,6 @@
 package sitemap
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -13,25 +12,20 @@ func Parse(baseUrl string) (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	sitemap := Node{url: baseUrl}
-	err = buildSitemap(client, sitemap.url, &sitemap)
+	sitemap, err := buildSitemap(client, baseUrl, nil)
 	if err != nil {
-		panic(err)
 		return nil, err
 	}
-	sitemap.Print("")
-	fmt.Println("printing")
-	fmt.Println(sitemap.flat())
-	for _, v := range sitemap.flat() {
-		fmt.Println(v.url)
-	}
-	return nil, nil
+	return sitemap, nil
 }
 
-func buildSitemap(client *internal.Client, baseUrl string, node *Node) error {
+func buildSitemap(client *internal.Client, baseUrl string, node *Node) (*Node, error) {
+	if node == nil {
+		node = &Node{url: baseUrl}
+	}
 	links, err := client.GetPageLinks(node.url)
 	if err != nil {
-		return err
+		return node, err
 	}
 	for _, link := range links {
 		cleanLink, err := cleanUrl(link.Href, baseUrl)
@@ -40,12 +34,12 @@ func buildSitemap(client *internal.Client, baseUrl string, node *Node) error {
 		}
 	}
 	for _, child := range node.children {
-		err := buildSitemap(client, baseUrl, child)
+		node, err := buildSitemap(client, baseUrl, child)
 		if err != nil {
-			return err
+			return node, err
 		}
 	}
-	return nil
+	return node, nil
 }
 
 func cleanUrl(url, domain string) (string, error) {
@@ -64,7 +58,7 @@ func cleanUrl(url, domain string) (string, error) {
 	}
 	// not in our website
 	if !strings.HasPrefix(url, domain) {
-		return "", errors.New("not in targeted domain")
+		return "", fmt.Errorf("not in target domain %s is not in %s", url, domain)
 	}
 	return url, nil
 }
