@@ -14,7 +14,7 @@ func TestNode_contains(t *testing.T) {
 	type args struct {
 		url string
 	}
-	want1 := &Node{"Hello", []*Node{{url: "World"}}, nil}
+	want1 := &Node{"Hello", []*Node{{Url: "World"}}, nil}
 	want1.children[0].parent = want1
 	tests := []struct {
 		name   string
@@ -24,13 +24,13 @@ func TestNode_contains(t *testing.T) {
 	}{
 		{
 			name:   "Single child",
-			fields: fields{want1.url, want1.children, want1.parent},
-			args:   args{want1.children[0].url},
+			fields: fields{want1.Url, want1.children, want1.parent},
+			args:   args{want1.children[0].Url},
 			want:   true,
 		},
 		{
 			name:   "Single child doesn't not contain",
-			fields: fields{want1.url, want1.children, want1.parent},
+			fields: fields{want1.Url, want1.children, want1.parent},
 			args:   args{"Unknown string"},
 			want:   false,
 		},
@@ -38,7 +38,7 @@ func TestNode_contains(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			node := &Node{
-				url:      tt.fields.url,
+				Url:      tt.fields.url,
 				children: tt.fields.children,
 				parent:   tt.fields.parent,
 			}
@@ -58,7 +58,7 @@ func TestNode_addChild(t *testing.T) {
 	type args struct {
 		url string
 	}
-	want1 := &Node{"Hello", []*Node{{url: "World"}}, nil}
+	want1 := &Node{"Hello", []*Node{{Url: "World"}}, nil}
 	want1.children[0].parent = want1
 	tests := []struct {
 		name   string
@@ -76,7 +76,7 @@ func TestNode_addChild(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			node := &Node{
-				url:      tt.fields.url,
+				Url:      tt.fields.url,
 				children: tt.fields.children,
 				parent:   tt.fields.parent,
 			}

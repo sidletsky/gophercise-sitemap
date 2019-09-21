@@ -5,14 +5,14 @@ import (
 )
 
 type Node struct {
-	url      string
+	Url      string
 	children []*Node
 	parent   *Node
 }
 
 func (node *Node) addChild(url string) *Node {
 	if !node.root().contains(url) {
-		newNode := Node{url: url, parent: node}
+		newNode := Node{Url: url, parent: node}
 		node.children = append(node.children, &newNode)
 	}
 	return node
@@ -29,7 +29,7 @@ func (node *Node) root() *Node {
 }
 
 func (node *Node) contains(url string) bool {
-	if node.url == url {
+	if node.Url == url {
 		return true
 	}
 	for _, child := range node.children {
@@ -41,17 +41,17 @@ func (node *Node) contains(url string) bool {
 }
 
 func (node *Node) Print(separator string) {
-	fmt.Println(separator, node.url)
+	fmt.Println(separator, node.Url)
 	for _, child := range node.children {
 		child.Print(separator + " ")
 	}
 }
 
-func (node Node) flat() []Node {
+func (node Node) Flat() []Node {
 	var nodes []Node
 	nodes = append(nodes, node)
 	for _, child := range node.children {
-		nodes = append(nodes, child.flat()...)
+		nodes = append(nodes, child.Flat()...)
 	}
 	return nodes
 }

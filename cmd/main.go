@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 
 	"github.com/sidletsky/sitemap"
+	"github.com/sidletsky/sitemap/internal"
 )
 
 var RootCmd = &cobra.Command{
@@ -14,7 +16,15 @@ var RootCmd = &cobra.Command{
 	Short: "sitemap can generate sitemap.xml for the provided url",
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]
-		_, _ = sitemap.Parse(url)
+		sitemap, err := sitemap.Parse(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var urls []string
+		for _, v := range sitemap.Flat() {
+			urls = append(urls, v.Url)
+		}
+		internal.CreateFile("example/sitemap.xml", urls)
 	},
 }
 

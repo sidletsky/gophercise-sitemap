@@ -21,9 +21,9 @@ func Parse(baseUrl string) (*Node, error) {
 
 func buildSitemap(client *internal.Client, baseUrl string, node *Node) (*Node, error) {
 	if node == nil {
-		node = &Node{url: baseUrl}
+		node = &Node{Url: baseUrl}
 	}
-	links, err := client.GetPageLinks(node.url)
+	links, err := client.GetPageLinks(node.Url)
 	if err != nil {
 		return node, err
 	}
