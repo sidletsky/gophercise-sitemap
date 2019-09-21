@@ -11,11 +11,17 @@ type Url struct {
 	Loc string
 }
 
-var header = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
-var footer = "</urlset>"
+func (u Url) String() string {
+	return fmt.Sprintf(`        <url>
+			<loc>%s</loc>
+		</url>`, u.Loc)
+}
 
-func CreateFile(file string, data []string) {
+const header = `<?xml version="1.0" encoding="UTF-8"?>
+	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
+const footer = "</urlset>"
+
+func CreateFile(file string, data map[string]Url) {
 	f, err := os.Create(file)
 	if err != nil {
 		log.Fatal(err)
@@ -24,7 +30,7 @@ func CreateFile(file string, data []string) {
 
 	write(f, header)
 	for _, v := range data {
-		write(f, v)
+		write(f, v.String())
 	}
 	write(f, footer)
 }

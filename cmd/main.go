@@ -20,11 +20,7 @@ var RootCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		var urls []string
-		for _, v := range sitemap {
-			urls = append(urls, v.Loc)
-		}
-		internal.CreateFile("example/sitemap.xml", urls)
+		internal.CreateFile("example/sitemap.xml", sitemap)
 	},
 }
 

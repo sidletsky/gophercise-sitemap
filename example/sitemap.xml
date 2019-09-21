@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-https://www.duckduckgo.com
-https://www.duckduckgo.com/about
-https://www.duckduckgo.com/about/hiring
+	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <url>
+			<loc>http://www.duckduckgo.com</loc>
+		</url>
+        <url>
+			<loc>http://www.duckduckgo.com/about</loc>
+		</url>
+        <url>
+			<loc>http://www.duckduckgo.com/about/hiring</loc>
+		</url>
 </urlset>
