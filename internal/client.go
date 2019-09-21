@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"golang.org/x/net/html"
+
+	"github.com/sidletsky/sitemap/url"
 )
 
 type HttpClient struct {
@@ -31,13 +33,13 @@ func NewClient(baseUrl string, httpClient *http.Client) (*HttpClient, error) {
 	return &Client, nil
 }
 
-func (client *HttpClient) GetPageLinks(url string) ([]Url, error) {
+func (client *HttpClient) GetPageLinks(url string) ([]url.Url, error) {
 	page, err := client.getPage(url)
 	if err != nil {
 		return nil, err
 	}
 	reader := bytes.NewReader(page)
-	links, err := parse(reader)
+	links, err := getPageLinks(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +57,7 @@ func (client *HttpClient) getPage(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	response, err := Client.HttpClient.Do(req)
+	response, err := client.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -67,13 +69,13 @@ func (client *HttpClient) getPage(url string) ([]byte, error) {
 	return htmlPage, nil
 }
 
-// parse returns all links in html file
-func parse(r io.Reader) ([]Url, error) {
+// getPageLinks returns all links in html file
+func getPageLinks(r io.Reader) ([]url.Url, error) {
 	doc, err := html.Parse(r)
 	if err != nil {
 		return nil, err
 	}
-	var links []Url
+	var links []url.Url
 	nodes := linkNodes(doc)
 	for _, node := range nodes {
 		links = append(links, buildLink(node))
@@ -94,8 +96,8 @@ func linkNodes(n *html.Node) []*html.Node {
 }
 
 // buildLink returns a struct Url from an html.Node element
-func buildLink(n *html.Node) Url {
-	var ret Url
+func buildLink(n *html.Node) url.Url {
+	var ret url.Url
 	for _, attr := range n.Attr {
 		if attr.Key == "href" {
 			ret.Loc = attr.Val

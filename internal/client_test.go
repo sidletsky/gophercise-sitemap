@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/sidletsky/sitemap/url"
 )
 
 func Test_parse(t *testing.T) {
@@ -14,19 +16,19 @@ func Test_parse(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []Url
+		want    []url.Url
 		wantErr bool
 	}{
 		{
 			name:    "ex1.html",
 			args:    args{r: strings.NewReader(ex1)},
-			want:    []Url{{Loc: "/other-page"}},
+			want:    []url.Url{{Loc: "/other-page"}},
 			wantErr: false,
 		},
 		{
 			name: "ex2.html",
 			args: args{r: strings.NewReader(ex2)},
-			want: []Url{
+			want: []url.Url{
 				{Loc: "https://www.twitter.com/joncalhoun"},
 				{Loc: "https://github.com/gophercises"}},
 			wantErr: false,
@@ -34,7 +36,7 @@ func Test_parse(t *testing.T) {
 		{
 			name: "ex3.html",
 			args: args{r: strings.NewReader(ex3)},
-			want: []Url{
+			want: []url.Url{
 				{Loc: "#"},
 				{Loc: "/lost"},
 				{Loc: "https://twitter.com/marcusolsson"}},
@@ -43,19 +45,19 @@ func Test_parse(t *testing.T) {
 		{
 			name:    "ex4.html",
 			args:    args{r: strings.NewReader(ex4)},
-			want:    []Url{{Loc: "/dog-cat"}},
+			want:    []url.Url{{Loc: "/dog-cat"}},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parse(tt.args.r)
+			got, err := getPageLinks(tt.args.r)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parse() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getPageLinks() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("parse() = %v, want %v", got, tt.want)
+				t.Errorf("getPageLinks() = %v, want %v", got, tt.want)
 			}
 		})
 	}

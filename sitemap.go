@@ -1,19 +1,19 @@
 package sitemap
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/sidletsky/sitemap/internal"
+	"github.com/sidletsky/sitemap/url"
 )
 
-type UrlMap map[string]internal.Url
+type UrlMap map[string]url.Url
 
 var httpClient *internal.HttpClient
 
-func Parse(baseUrl string, client *http.Client) (UrlMap, error) {
+func Parse(siteUrl string, client *http.Client) (UrlMap, error) {
+	baseUrl := url.CleanBase(siteUrl)
 	var err error
 	httpClient, err = internal.NewClient(baseUrl, client)
 	if err != nil {
@@ -28,57 +28,36 @@ func Parse(baseUrl string, client *http.Client) (UrlMap, error) {
 
 func buildSitemap(baseUrl string) (UrlMap, error) {
 	urls := make(UrlMap)
-	urls[baseUrl] = internal.Url{Loc: baseUrl}
-	urls, err := buildSitemapRecursively(baseUrl, urls)
+	urls[baseUrl] = url.Url{Loc: baseUrl}
+	urls, err := buildSitemapRecursively(baseUrl, baseUrl, urls)
 	if err != nil {
 		return nil, err
 	}
 	return urls, nil
 }
 
-func buildSitemapRecursively(baseUrl string, urls UrlMap) (UrlMap, error) {
-	links, err := httpClient.GetPageLinks(baseUrl)
+func buildSitemapRecursively(pageUrl, baseUrl string, urls UrlMap) (UrlMap, error) {
+	links, err := httpClient.GetPageLinks(pageUrl)
 	if err != nil {
 		return nil, err
 	}
 	for _, link := range links {
-		cleanLink, err := cleanUrl(link.Loc, baseUrl)
-		if _, ok := urls[cleanLink]; !ok && err == nil {
-			urls[cleanLink] = internal.Url{Loc: cleanLink}
-			linkUrls, err := buildSitemapRecursively(cleanLink, urls)
+		cleanLink := url.Clean(link.Loc, pageUrl)
+		if _, ok := urls[cleanLink]; !ok && url.InTargetDomain(cleanLink, baseUrl) {
+			urls[cleanLink] = url.Url{Loc: cleanLink}
+			linkUrls, err := buildSitemapRecursively(cleanLink, baseUrl, urls)
 			if err != nil {
 				return nil, err
 			}
-			urls = join(urls, linkUrls)
+			urls = unionMaps(urls, linkUrls)
 		}
 	}
 	return urls, nil
 }
 
-func join(a, b UrlMap) UrlMap {
+func unionMaps(a, b UrlMap) UrlMap {
 	for k, v := range b {
 		a[k] = v
 	}
 	return a
-}
-
-func cleanUrl(url, domain string) (string, error) {
-	// relative link (e.g. /content)
-	if url == "/" {
-		return domain, nil
-	}
-	if strings.HasSuffix(domain, "/") {
-		domain = domain[:len(domain)-1]
-	}
-	if strings.HasPrefix(url, "/") {
-		url = domain + url
-	}
-	if strings.HasSuffix(url, "/") {
-		url = url[:len(url)-1]
-	}
-	// not in our website
-	if !strings.HasPrefix(url, domain) {
-		return "", fmt.Errorf("not in target domain %s is not in %s", url, domain)
-	}
-	return url, nil
 }
