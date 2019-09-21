@@ -3,6 +3,7 @@ package sitemap
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/sidletsky/sitemap/internal"
@@ -10,14 +11,14 @@ import (
 
 type UrlMap map[string]internal.Url
 
-var httpClient internal.Client
+var httpClient *internal.HttpClient
 
-func Parse(baseUrl string) (UrlMap, error) {
-	client, err := internal.NewClient(nil, baseUrl)
+func Parse(baseUrl string, client *http.Client) (UrlMap, error) {
+	var err error
+	httpClient, err = internal.NewClient(baseUrl, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	httpClient = *client
 	sitemap, err := buildSitemap(baseUrl)
 	if err != nil {
 		return nil, err
@@ -41,7 +42,7 @@ func buildSitemapRecursively(baseUrl string, urls UrlMap) (UrlMap, error) {
 		return nil, err
 	}
 	for _, link := range links {
-		cleanLink, err := cleanUrl(link.Href, baseUrl)
+		cleanLink, err := cleanUrl(link.Loc, baseUrl)
 		if _, ok := urls[cleanLink]; !ok && err == nil {
 			urls[cleanLink] = internal.Url{Loc: cleanLink}
 			linkUrls, err := buildSitemapRecursively(cleanLink, urls)

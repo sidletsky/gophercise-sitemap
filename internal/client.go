@@ -3,30 +3,45 @@ package internal
 import (
 	"bytes"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"strings"
 
-	link "github.com/sidletsky/gophercise-link"
+	"golang.org/x/net/html"
 )
 
-type Client struct {
+type HttpClient struct {
 	HttpClient *http.Client
 }
 
-// NewClient returns a Client that that wraps operations.
-func NewClient(httpClient *http.Client, baseUrl string) (*Client, error) {
-	var client Client
+var Client HttpClient
+
+// NewClient returns a HttpClient that that wraps operations.
+func NewClient(baseUrl string, httpClient *http.Client) (*HttpClient, error) {
 	if httpClient == nil {
-		client.HttpClient = http.DefaultClient
+		Client.HttpClient = http.DefaultClient
 	} else {
-		client.HttpClient = httpClient
+		Client.HttpClient = httpClient
 	}
 	if !ping(baseUrl) {
 		return nil, errors.New("destination host unreachable")
 	}
-	return &client, nil
+	return &Client, nil
+}
+
+func (client *HttpClient) GetPageLinks(url string) ([]Url, error) {
+	page, err := client.getPage(url)
+	if err != nil {
+		return nil, err
+	}
+	reader := bytes.NewReader(page)
+	links, err := parse(reader)
+	if err != nil {
+		return nil, err
+	}
+	return links, nil
 }
 
 func ping(url string) bool {
@@ -34,26 +49,13 @@ func ping(url string) bool {
 	return !strings.Contains(string(out), "Destination Host Unreachable")
 }
 
-func (client *Client) GetPageLinks(url string) ([]link.Link, error) {
-	page, err := client.getPage(url)
-	if err != nil {
-		return nil, err
-	}
-	reader := bytes.NewReader(page)
-	links, err := link.Parse(reader)
-	if err != nil {
-		return nil, err
-	}
-	return links, nil
-}
-
 // getPage makes an http get request
-func (client *Client) getPage(url string) ([]byte, error) {
+func (client *HttpClient) getPage(url string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
-	response, err := client.HttpClient.Do(req)
+	response, err := Client.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -63,4 +65,42 @@ func (client *Client) getPage(url string) ([]byte, error) {
 		return nil, err
 	}
 	return htmlPage, nil
+}
+
+// parse returns all links in html file
+func parse(r io.Reader) ([]Url, error) {
+	doc, err := html.Parse(r)
+	if err != nil {
+		return nil, err
+	}
+	var links []Url
+	nodes := linkNodes(doc)
+	for _, node := range nodes {
+		links = append(links, buildLink(node))
+	}
+	return links, nil
+}
+
+// linkNodes returns list of nodes which are links
+func linkNodes(n *html.Node) []*html.Node {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		return []*html.Node{n}
+	}
+	var ret []*html.Node
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		ret = append(ret, linkNodes(c)...)
+	}
+	return ret
+}
+
+// buildLink returns a struct Url from an html.Node element
+func buildLink(n *html.Node) Url {
+	var ret Url
+	for _, attr := range n.Attr {
+		if attr.Key == "href" {
+			ret.Loc = attr.Val
+			break
+		}
+	}
+	return ret
 }

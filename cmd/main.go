@@ -16,7 +16,7 @@ var RootCmd = &cobra.Command{
 	Short: "sitemap can generate sitemap.xml for the provided url",
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]
-		sitemap, err := sitemap.Parse(url)
+		sitemap, err := sitemap.Parse(url, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
