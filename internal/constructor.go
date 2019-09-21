@@ -17,15 +17,18 @@ func CreateFile(file string, data map[string]Url) {
 		log.Fatal(err)
 	}
 	defer f.Close()
-
-	write(f, header)
-	for _, v := range data {
-		write(f, v.String())
-	}
-	write(f, footer)
+	write(f, data)
 }
 
-func write(w io.Writer, a string) {
+func write(w io.Writer, data map[string]Url) {
+	writeLine(w, header)
+	for _, v := range data {
+		writeLine(w, v.String())
+	}
+	writeLine(w, footer)
+}
+
+func writeLine(w io.Writer, a string) {
 	_, err := fmt.Fprintln(w, a)
 	if err != nil {
 		log.Println(err)
