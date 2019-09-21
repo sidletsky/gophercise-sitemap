@@ -13,7 +13,7 @@ import (
 
 var file string
 var RootCmd = &cobra.Command{
-	Use:              "sitemap [URL] [FLAGS]",
+	Use:              "sitemap [URL]",
 	Short:            "sitemap can generate sitemap file for the provided url",
 	TraverseChildren: true,
 	Args:             cobra.ExactValidArgs(1),
