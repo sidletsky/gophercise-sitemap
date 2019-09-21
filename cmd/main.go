@@ -11,20 +11,24 @@ import (
 	"github.com/sidletsky/sitemap/internal"
 )
 
+var file string
 var RootCmd = &cobra.Command{
-	Use:   "sitemap",
-	Short: "sitemap can generate sitemap.xml for the provided url",
+	Use:              "sitemap [URL] [FLAGS]",
+	Short:            "sitemap can generate sitemap file for the provided url",
+	TraverseChildren: true,
+	Args:             cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		url := args[0]
 		sitemap, err := sitemap.Parse(url, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
-		internal.CreateFile("example/sitemap.xml", sitemap)
+		internal.CreateFile(file, sitemap)
 	},
 }
 
 func main() {
+	RootCmd.PersistentFlags().StringVarP(&file, "file", "f", "sitemap.xml", "name of an output file")
 	err := RootCmd.Execute()
 	if err != nil {
 		fmt.Println(err.Error())
