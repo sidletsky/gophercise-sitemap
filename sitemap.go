@@ -2,44 +2,63 @@ package sitemap
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/sidletsky/sitemap/internal"
 )
 
-func Parse(baseUrl string) (*Node, error) {
+type UrlMap map[string]internal.Url
+
+var httpClient internal.Client
+
+func Parse(baseUrl string) (UrlMap, error) {
 	client, err := internal.NewClient(nil, baseUrl)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	sitemap, err := buildSitemap(client, baseUrl, nil)
+	httpClient = *client
+	sitemap, err := buildSitemap(baseUrl)
 	if err != nil {
 		return nil, err
 	}
 	return sitemap, nil
 }
 
-func buildSitemap(client *internal.Client, baseUrl string, node *Node) (*Node, error) {
-	if node == nil {
-		node = &Node{Url: baseUrl}
-	}
-	links, err := client.GetPageLinks(node.Url)
+func buildSitemap(baseUrl string) (UrlMap, error) {
+	urls := make(UrlMap)
+	urls[baseUrl] = internal.Url{Loc: baseUrl}
+	urls, err := buildSitemapRecursively(baseUrl, urls)
 	if err != nil {
-		return node, err
+		return nil, err
+	}
+	return urls, nil
+}
+
+func buildSitemapRecursively(baseUrl string, urls UrlMap) (UrlMap, error) {
+	links, err := httpClient.GetPageLinks(baseUrl)
+	if err != nil {
+		return nil, err
 	}
 	for _, link := range links {
 		cleanLink, err := cleanUrl(link.Href, baseUrl)
-		if err == nil {
-			node.addChild(cleanLink)
+		if _, ok := urls[cleanLink]; !ok && err == nil {
+			urls[cleanLink] = internal.Url{Loc: cleanLink}
+			linkUrls, err := buildSitemapRecursively(cleanLink, urls)
+			if err != nil {
+				return nil, err
+			}
+			urls = join(urls, linkUrls)
 		}
 	}
-	for _, child := range node.children {
-		node, err := buildSitemap(client, baseUrl, child)
-		if err != nil {
-			return node, err
-		}
+	return urls, nil
+}
+
+func join(a, b UrlMap) UrlMap {
+	for k, v := range b {
+		a[k] = v
 	}
-	return node, nil
+	return a
 }
 
 func cleanUrl(url, domain string) (string, error) {
