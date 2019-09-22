@@ -6,8 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os/exec"
-	"strings"
 
 	"golang.org/x/net/html"
 
@@ -27,7 +25,7 @@ func NewClient(baseUrl string, httpClient *http.Client) (*HttpClient, error) {
 	} else {
 		Client.HttpClient = httpClient
 	}
-	if !ping(baseUrl) {
+	if !Client.ping(baseUrl) {
 		return nil, errors.New("destination host unreachable")
 	}
 	return &Client, nil
@@ -46,9 +44,17 @@ func (client *HttpClient) GetPageLinks(url string) ([]url.Url, error) {
 	return links, nil
 }
 
-func ping(url string) bool {
-	out, _ := exec.Command("ping", url, "-c 5", "-i 3", "-w 10").Output()
-	return !strings.Contains(string(out), "Destination Host Unreachable")
+func (client *HttpClient) ping(url string) bool {
+	req, err := http.NewRequest(http.MethodHead, url, nil)
+	if err != nil {
+		return false
+	}
+	res, err := client.HttpClient.Do(req)
+	if err != nil {
+		return false
+	}
+	defer res.Body.Close()
+	return true
 }
 
 // getPage makes an http get request
