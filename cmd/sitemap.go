@@ -15,7 +15,7 @@ var file string
 var RootCmd = &cobra.Command{
 	Use:              "sitemap [URL]",
 	Short:            "sitemap generates sitemap file for the given url",
-	Long:             "sitemap generates automatically creates sitemap.xml file for the given url",
+	Long:             "sitemap automatically creates sitemap.xml file for the given url",
 	Example:          "sitemap https://duckduckgo.com/",
 	TraverseChildren: true,
 	Args:             cobra.ExactValidArgs(1),
