@@ -1,7 +1,6 @@
 package sitemap
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/sidletsky/sitemap/internal"
@@ -17,7 +16,7 @@ func Parse(siteUrl string, client *http.Client) (UrlMap, error) {
 	var err error
 	httpClient, err = internal.NewClient(baseUrl, client)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	sitemap, err := buildSitemap(baseUrl)
 	if err != nil {
