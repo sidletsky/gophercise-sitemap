@@ -14,7 +14,9 @@ import (
 var file string
 var RootCmd = &cobra.Command{
 	Use:              "sitemap [URL]",
-	Short:            "sitemap can generate sitemap file for the provided url",
+	Short:            "sitemap generates sitemap file for the given url",
+	Long:             "sitemap generates automatically creates sitemap.xml file for the given url",
+	Example:          "sitemap https://duckduckgo.com/",
 	TraverseChildren: true,
 	Args:             cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
