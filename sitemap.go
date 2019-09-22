@@ -27,7 +27,7 @@ func Parse(siteUrl string, client *http.Client) (UrlMap, error) {
 
 func buildSitemap(baseUrl string) (UrlMap, error) {
 	urls := make(UrlMap)
-	urls[baseUrl] = url.Url{Loc: baseUrl}
+	urls[baseUrl] = url.New(baseUrl)
 	urls, err := buildSitemapRecursively(baseUrl, baseUrl, urls)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func buildSitemapRecursively(pageUrl, baseUrl string, urls UrlMap) (UrlMap, erro
 	for _, link := range links {
 		cleanLink := url.Clean(link.Loc, pageUrl)
 		if _, ok := urls[cleanLink]; !ok && url.InTargetDomain(cleanLink, baseUrl) {
-			urls[cleanLink] = url.Url{Loc: cleanLink}
+			urls[cleanLink] = url.New(cleanLink)
 			linkUrls, err := buildSitemapRecursively(cleanLink, baseUrl, urls)
 			if err != nil {
 				return nil, err

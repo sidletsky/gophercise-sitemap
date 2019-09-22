@@ -1,6 +1,7 @@
 package url
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -182,6 +183,30 @@ func Test_removeQueryString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := removeQueryString(tt.args.url); got != tt.want {
 				t.Errorf("removeQueryString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNew(t *testing.T) {
+	type args struct {
+		loc string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Url
+	}{
+		{
+			name: "returns same output",
+			args: args{loc: "random input"},
+			want: Url{Loc: "random input"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := New(tt.args.loc); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
 		})
 	}

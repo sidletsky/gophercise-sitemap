@@ -9,6 +9,10 @@ type Url struct {
 	Loc string
 }
 
+func New(loc string) Url {
+	return Url{Loc: loc}
+}
+
 func (u Url) String() string {
 	return fmt.Sprintf(`        <url>
 			<loc>%s</loc>
