@@ -14,9 +14,9 @@ func New(loc string) Url {
 }
 
 func (u Url) String() string {
-	return fmt.Sprintf(`        <url>
-			<loc>%s</loc>
-		</url>`, u.Loc)
+	return fmt.Sprintf(`    <url>
+        <loc>%s</loc>
+    </url>`, u.Loc)
 }
 
 func removeQueryString(url string) string {
