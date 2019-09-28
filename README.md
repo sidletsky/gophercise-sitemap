@@ -111,3 +111,6 @@ Example output for `sitemap https://duckduckgo.com/`
     </url>
 </urlset>
 ```
+
+## Related
+- [sitemap protocol specifications at https://www.sitemaps.org/protocol.html](https://www.sitemaps.org/protocol.html) 
