@@ -5,7 +5,7 @@ Simple sitemap generator for the given url
 sitemap [URL] [flags]
 ```
 
-### Usage
+### CLI usage
 
 Generating sitemap into ./sitemap.xml
 ```bash
@@ -16,14 +16,14 @@ Generating sitemap into ./my_own_name.xml
 sitemap https://duckduckgo.com/ -f my_own_name.xml
 ```
 
-### Options
+#### Options
 
 ```
   -f, --file string   name of an output file (default "sitemap.xml")
   -h, --help          help for sitemap
 ```
 
-### Output
+#### Output
 Example output for `sitemap https://duckduckgo.com/`
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -112,5 +112,53 @@ Example output for `sitemap https://duckduckgo.com/`
 </urlset>
 ```
 
-## Related
+### Package usage
+Basic example
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/sidletsky/sitemap"
+)
+
+func main() {
+	urls, err := sitemap.Parse(" https://duckduckgo.com/", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, url := range urls {
+		fmt.Println(url.Loc)
+	}
+}
+```
+
+With custom http client (in this case it's Google's App Engine)
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/urlfetch"
+	"github.com/sidletsky/sitemap"
+)
+
+...
+	ctx := appengine.NewContext(r)
+	client := urlfetch.Client(ctx)
+	urls, err := sitemap.Parse(" https://duckduckgo.com/", client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, url := range urls {
+		fmt.Println(url.Loc)
+	}
+...
+```
+### Related
 - [sitemap protocol specifications at https://www.sitemaps.org/protocol.html](https://www.sitemaps.org/protocol.html) 
