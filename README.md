@@ -1,18 +1,18 @@
 ## sitemap
 
 Simple sitemap generator for the given url
-```
+```bash
 sitemap [URL] [flags]
 ```
 
-### Examples
+### Usage
 
 Generating sitemap into ./sitemap.xml
-```
+```bash
 sitemap https://duckduckgo.com/
 ```
 Generating sitemap into ./my_own_name.xml
-```
+```bash
 sitemap https://duckduckgo.com/ -f my_own_name.xml
 ```
 
@@ -23,3 +23,91 @@ sitemap https://duckduckgo.com/ -f my_own_name.xml
   -h, --help          help for sitemap
 ```
 
+### Output
+Example output for `sitemap https://duckduckgo.com/`
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://duckduckgo.com/bang/newbang/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/HTTP_Secure/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/HTTP_referrer/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/bang/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/about/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/donations/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/params/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/press/assets/press/DuckDuckGo-Brand-Logo.zip/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/press/assets/press/DuckDuckGo-Photos.zip/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/about/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/IP_Address/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/hiring/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/assets/email/DuckDuckGo-Privacy-Weekly_sample.png/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/press/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/spread/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/traffic/spread/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/Electronic_Frontier_Foundation/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/bang/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/User_agent/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/HTTP_cookie/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/feedback/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/traffic/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/app/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/privacy/settings/</loc>
+    </url>
+    <url>
+        <loc>https://duckduckgo.com/about/hiring/</loc>
+    </url>
+</urlset>
+```
